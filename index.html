@@ -304,7 +304,7 @@
 <!-- AUTH BAR -->
 <div id="auth-bar">
   <span id="auth-status">No autenticado</span>
-  <button id="auth-btn" onclick="iniciarSesion()">Conectar con </button>
+  <button id="auth-btn" onclick="iniciarSesion()">Conectar con Google</button>
 </div>
  
 <!-- STEPPER -->
@@ -548,7 +548,7 @@ function setFechaHora() {
    AUTENTICACIÓN
 ═══════════════════════════════════════════════════ */
 function iniciarSesion() {
-  if (CLIENT_ID === '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.googleusercontent.com') {
+  if (CLIENT_ID === 'TU_GOOGLE_CLIENT_ID_AQUI') {
     toast('Configura CLIENT_ID antes de usar', 'err'); return;
   }
   tokenClient.requestAccessToken();
@@ -871,17 +871,48 @@ async function generarPDF() {
   if (fotosData.length > 0) {
     sectionTitle('4. Evidencia Fotográfica');
     const IW = (PW - ML - MR - 8) / 2;
-    const IH = IW * 0.70;
+    const IH = IW * 0.75;
+    // Resolución en píxeles para el canvas de reescalado (150 DPI aprox)
+    const PX_W = Math.round(IW * 150 / 25.4);
+    const PX_H = Math.round(IH * 150 / 25.4);
     let col = 0;
     const startX = [ML, ML + IW + 8];
  
     for (const f of fotosData) {
       if (col === 0) checkPage(IH + 10);
       const x = startX[col];
+ 
+      // Redimensionar imagen con canvas para evitar degradación
+      let imgDataUrl = f.dataUrl;
       try {
-        doc.addImage(f.dataUrl, 'JPEG', x, y, IW, IH, undefined, 'MEDIUM');
+        await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const cvs = document.createElement('canvas');
+            cvs.width  = PX_W;
+            cvs.height = PX_H;
+            const ctx2 = cvs.getContext('2d');
+            // Calcular recorte centrado manteniendo proporción
+            const ratio = Math.min(PX_W / img.width, PX_H / img.height);
+            const nw = img.width  * ratio;
+            const nh = img.height * ratio;
+            const ox = (PX_W - nw) / 2;
+            const oy = (PX_H - nh) / 2;
+            ctx2.fillStyle = '#ffffff';
+            ctx2.fillRect(0, 0, PX_W, PX_H);
+            ctx2.drawImage(img, ox, oy, nw, nh);
+            imgDataUrl = cvs.toDataURL('image/jpeg', 0.92);
+            resolve();
+          };
+          img.onerror = resolve;
+          img.src = f.dataUrl;
+        });
+      } catch(e) { /* usa original si falla */ }
+ 
+      try {
+        doc.addImage(imgDataUrl, 'JPEG', x, y, IW, IH, undefined, 'FAST');
       } catch(e) {
-        try { doc.addImage(f.dataUrl, 'PNG', x, y, IW, IH); } catch {}
+        try { doc.addImage(f.dataUrl, 'JPEG', x, y, IW, IH, undefined, 'FAST'); } catch {}
       }
       doc.setDrawColor(180,200,210);
       doc.rect(x, y, IW, IH, 'S');
@@ -1034,3 +1065,4 @@ self.addEventListener('fetch', e => {
 </script>
 </body>
 </html>
+ 
