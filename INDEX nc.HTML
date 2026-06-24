@@ -304,7 +304,7 @@
 <!-- AUTH BAR -->
 <div id="auth-bar">
   <span id="auth-status">No autenticado</span>
-  <button id="auth-btn" onclick="iniciarSesion()">Conectar con Google</button>
+  <button id="auth-btn" onclick="iniciarSesion()">Conectar con </button>
 </div>
  
 <!-- STEPPER -->
@@ -492,7 +492,7 @@
 /* ═══════════════════════════════════════════════════
    CONFIGURACIÓN
 ═══════════════════════════════════════════════════ */
-const CLIENT_ID   = 'TU_GOOGLE_CLIENT_ID_AQUI';
+const CLIENT_ID   = '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.googleusercontent.com';
 const FOLDER_ID   = '1GsYgIdVYF2wIrxu0Kh64KzP0YCrY0858';   // Carpeta Drive No Conformidades & Hallazgos
 const SCOPES      = 'https://www.googleapis.com/auth/drive.file';
  
@@ -523,7 +523,7 @@ window.addEventListener('load', () => {
   setFechaHora();
   initFotoGrid();
   initCanvas();
-  if (CLIENT_ID === 'TU_GOOGLE_CLIENT_ID_AQUI') return;
+  if (CLIENT_ID === '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.googleusercontent.com') return;
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
