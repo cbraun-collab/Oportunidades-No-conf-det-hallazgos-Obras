@@ -304,7 +304,7 @@
 <!-- AUTH BAR -->
 <div id="auth-bar">
   <span id="auth-status">No autenticado</span>
-  <button id="auth-btn" onclick="iniciarSesion()">Conectar con Google</button>
+  <button id="auth-btn" onclick="iniciarSesion()">Conectar con </button>
 </div>
  
 <!-- STEPPER -->
@@ -485,16 +485,16 @@
 <!-- TOAST -->
 <div id="toast"></div>
  
-<!-- GOOGLE IDENTITY SERVICES -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<!--  IDENTITY SERVICES -->
+<script src="https://accounts..com/gsi/client" async defer></script>
  
 <script>
 /* ═══════════════════════════════════════════════════
    CONFIGURACIÓN
 ═══════════════════════════════════════════════════ */
-const CLIENT_ID   = '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.googleusercontent.com';
+const CLIENT_ID   = '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.usercontent.com';
 const FOLDER_ID   = '1GsYgIdVYF2wIrxu0Kh64KzP0YCrY0858';   // Carpeta Drive No Conformidades & Hallazgos
-const SCOPES      = 'https://www.googleapis.com/auth/drive.file';
+const SCOPES      = 'https://www.apis.com/auth/drive.file';
  
 let accessToken   = null;
 let tokenClient   = null;
@@ -523,8 +523,8 @@ window.addEventListener('load', () => {
   setFechaHora();
   initFotoGrid();
   initCanvas();
-  if (CLIENT_ID === '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.googleusercontent.com') return;
-  tokenClient = google.accounts.oauth2.initTokenClient({
+  if (CLIENT_ID === '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.usercontent.com') return;
+  tokenClient = .accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
     prompt: 'consent',
@@ -548,7 +548,7 @@ function setFechaHora() {
    AUTENTICACIÓN
 ═══════════════════════════════════════════════════ */
 function iniciarSesion() {
-  if (CLIENT_ID === 'TU_GOOGLE_CLIENT_ID_AQUI') {
+  if (CLIENT_ID === '72369192874-rgv4vqjl243p39fv0dntkl5a4m13s8k6.apps.googleusercontent.com') {
     toast('Configura CLIENT_ID antes de usar', 'err'); return;
   }
   tokenClient.requestAccessToken();
