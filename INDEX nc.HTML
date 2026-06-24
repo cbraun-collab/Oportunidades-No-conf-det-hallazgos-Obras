@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>No Conformidades & Hallazgos – SENERCOM</title>
+<meta name="theme-color" content="#003B49" />
+<link rel="manifest" href="manifest.json" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+ 
+<style>
+  :root {
+    --navy:   #003B49;
+    --teal:   #005F73;
+    --red:    #CF4520;
+    --amber:  #E8A020;
+    --light:  #F0F4F6;
+    --white:  #FFFFFF;
+    --text:   #1A2B30;
+    --muted:  #6B8490;
+    --border: #C5D3D8;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,59,73,0.13);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--light);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+ 
+  /* ── HEADER ── */
+  header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  }
+  .logo-box {
+    width: 44px; height: 44px;
+    background: var(--red);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700; font-size: 13px; color: var(--white); letter-spacing: .5px;
+  }
+  .header-text h1 { font-size: 15px; font-weight: 700; line-height: 1.2; }
+  .header-text p  { font-size: 11px; color: #9FC0C8; margin-top: 2px; }
+ 
+  /* ── AUTH BAR ── */
+  #auth-bar {
+    background: var(--teal);
+    color: var(--white);
+    font-size: 12px;
+    padding: 8px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  #auth-bar span { flex: 1; }
+  #auth-bar button {
+    background: rgba(255,255,255,.18); border: none; color: var(--white);
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    padding: 5px 14px; border-radius: 6px; cursor: pointer;
+  }
+  #auth-bar button:hover { background: rgba(255,255,255,.30); }
+ 
+  /* ── STEPPER ── */
+  #stepper {
+    display: flex;
+    background: var(--navy);
+    padding: 0 16px 14px;
+    gap: 6px;
+  }
+  .step-dot {
+    flex: 1; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,.22);
+    transition: background .3s;
+  }
+  .step-dot.active  { background: var(--amber); }
+  .step-dot.done    { background: #4CA8C0; }
+ 
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    padding: 20px 16px 40px;
+    max-width: 640px;
+    width: 100%;
+    margin: 0 auto;
+  }
+ 
+  /* ── SECTION CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 18px;
+    display: none;
+  }
+  .card.visible { display: block; }
+ 
+  .card-title {
+    font-size: 13px; font-weight: 700; letter-spacing: .8px;
+    text-transform: uppercase; color: var(--navy);
+    border-left: 3px solid var(--red);
+    padding-left: 10px; margin-bottom: 16px;
+  }
+ 
+  /* ── FORM FIELDS ── */
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  .field { margin-bottom: 14px; }
+  input[type="text"], input[type="date"], input[type="time"], select, textarea {
+    width: 100%; padding: 11px 13px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: inherit; font-size: 14px; color: var(--text);
+    background: var(--white); outline: none;
+    transition: border-color .2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--teal); }
+  textarea { resize: vertical; min-height: 100px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+ 
+  /* ── INTRO BANNER ── */
+  .intro-banner {
+    background: linear-gradient(135deg, #E8F4F7 0%, #EFF8F0 100%);
+    border: 1.5px solid #A8CEDA;
+    border-left: 4px solid var(--teal);
+    border-radius: 9px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .intro-banner .intro-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+  .intro-banner p {
+    font-size: 12.5px; line-height: 1.65; color: #1E4A55; font-weight: 500;
+  }
+  .intro-banner strong { color: var(--navy); }
+ 
+  /* ── TIPO BADGE ── */
+  .tipo-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .tipo-btn {
+    padding: 14px 8px; border-radius: 9px;
+    border: 2px solid var(--border); background: var(--white);
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; text-align: center; color: var(--muted);
+    transition: all .2s; line-height: 1.3;
+  }
+  .tipo-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .tipo-btn.selected-nc  { border-color: var(--red);   background: #FFF2EE; color: var(--red); }
+  .tipo-btn.selected-hall{ border-color: var(--amber); background: #FFFBF0; color: #B87010; }
+  .tipo-btn.selected-om  { border-color: #1A8A50;      background: #F0FAF4; color: #1A6A3C; }
+  .tipo-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+ 
+  /* ── FOTOS ── */
+  .foto-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-bottom: 10px;
+  }
+  .foto-slot {
+    aspect-ratio: 1/1; border-radius: 8px;
+    border: 2px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
+    background: var(--light); cursor: pointer;
+    transition: border-color .2s;
+  }
+  .foto-slot:hover { border-color: var(--teal); }
+  .foto-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .foto-slot .add-icon { font-size: 28px; color: var(--border); pointer-events: none; }
+  .foto-slot .del-btn {
+    position: absolute; top: 3px; right: 3px;
+    background: rgba(0,0,0,.55); color: #fff;
+    border: none; border-radius: 50%; width: 22px; height: 22px;
+    font-size: 12px; cursor: pointer; display: none;
+    align-items: center; justify-content: center;
+  }
+  .foto-slot:hover .del-btn { display: flex; }
+  #file-input { display: none; }
+  .foto-hint { font-size: 11px; color: var(--muted); text-align: center; }
+ 
+  /* ── FIRMA ── */
+  .canvas-wrap {
+    border: 1.5px solid var(--border); border-radius: 8px;
+    overflow: hidden; background: #fff; margin-bottom: 8px;
+    position: relative;
+  }
+  canvas#firma-canvas { display: block; width: 100%; height: 140px; touch-action: none; cursor: crosshair; }
+  .canvas-actions { display: flex; gap: 8px; }
+  .btn-outline {
+    flex: 1; padding: 9px; border-radius: 8px;
+    border: 1.5px solid var(--border); background: var(--white);
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; color: var(--muted); transition: all .2s;
+  }
+  .btn-outline:hover { border-color: var(--red); color: var(--red); }
+ 
+  /* ── NAVIGATION BUTTONS ── */
+  .nav-btns {
+    display: flex; gap: 12px; margin-top: 6px;
+  }
+  .btn-back {
+    flex: 0 0 auto; padding: 13px 20px; border-radius: 9px;
+    border: 1.5px solid var(--border); background: var(--white);
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    cursor: pointer; color: var(--muted); transition: all .2s;
+  }
+  .btn-back:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-next {
+    flex: 1; padding: 13px; border-radius: 9px;
+    border: none; background: var(--navy); color: var(--white);
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer; letter-spacing: .4px; transition: background .2s;
+  }
+  .btn-next:hover { background: var(--teal); }
+  .btn-next:disabled { background: var(--border); cursor: not-allowed; }
+  .btn-save {
+    flex: 1; padding: 13px; border-radius: 9px;
+    border: none; background: var(--red); color: var(--white);
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer; letter-spacing: .4px; transition: background .2s;
+  }
+  .btn-save:hover { background: #A83518; }
+  .btn-save:disabled { background: var(--border); cursor: not-allowed; }
+ 
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--navy); color: #fff;
+    padding: 11px 22px; border-radius: 50px;
+    font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 18px rgba(0,0,0,.3);
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s; z-index: 999; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+  #toast.err  { background: var(--red); }
+  #toast.ok   { background: #1D7A54; }
+ 
+  /* ── SUCCESS SCREEN ── */
+  #success-screen {
+    display: none; flex-direction: column;
+    align-items: center; text-align: center; padding: 40px 20px;
+  }
+  #success-screen.visible { display: flex; }
+  .success-icon { font-size: 62px; margin-bottom: 16px; }
+  .success-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .success-sub   { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+  .btn-new {
+    padding: 14px 36px; border-radius: 9px;
+    border: none; background: var(--navy); color: var(--white);
+    font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+ 
+  /* ── SPINNER ── */
+  .spinner-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,59,73,.55); z-index: 500;
+    align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+  }
+  .spinner-overlay.show { display: flex; }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 5px solid rgba(255,255,255,.3);
+    border-top-color: var(--white);
+    border-radius: 50%; animation: spin .8s linear infinite;
+  }
+  .spinner-label { color: #fff; font-size: 14px; font-weight: 600; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+ 
+  @media (max-width: 400px) {
+    .row2 { grid-template-columns: 1fr; }
+    .foto-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+ 
+<!-- SPINNER -->
+<div class="spinner-overlay" id="spinner">
+  <div class="spinner"></div>
+  <div class="spinner-label" id="spinner-label">Guardando…</div>
+</div>
+ 
+<!-- HEADER -->
+<header>
+  <div class="logo-box">SEN</div>
+  <div class="header-text">
+    <h1>No Conformidades &amp; Hallazgos</h1>
+    <p>SENERCOM – Registro de Terreno</p>
+  </div>
+</header>
+ 
+<!-- AUTH BAR -->
+<div id="auth-bar">
+  <span id="auth-status">No autenticado</span>
+  <button id="auth-btn" onclick="iniciarSesion()">Conectar con Google</button>
+</div>
+ 
+<!-- STEPPER -->
+<div id="stepper">
+  <div class="step-dot active" id="dot0"></div>
+  <div class="step-dot" id="dot1"></div>
+  <div class="step-dot" id="dot2"></div>
+  <div class="step-dot" id="dot3"></div>
+</div>
+ 
+<!-- MAIN -->
+<main>
+ 
+  <!-- SUCCESS -->
+  <div id="success-screen">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Registro Guardado</div>
+    <div class="success-sub" id="success-msg">El documento PDF ha sido almacenado<br/>en la carpeta de Drive correctamente.</div>
+    <button class="btn-new" onclick="nuevoRegistro()">Nuevo Registro</button>
+  </div>
+ 
+  <!-- PASO 0: Identificación -->
+  <div class="card visible" id="step0">
+    <div class="card-title">Paso 1 — Identificación</div>
+ 
+    <!-- INTRODUCCIÓN -->
+    <div class="intro-banner">
+      <span class="intro-icon">💡</span>
+      <p>
+        <strong>El presente documento está destinado a realizar mejoras en las cosas que hacemos,
+        poniendo énfasis en la seguridad.</strong> No existen comentarios errados, todo ayuda a que
+        tengamos un proceso de mejora continua y será evaluado en la reunión respectiva, en base
+        al área que corresponda.
+      </p>
+    </div>
+ 
+    <div class="field">
+      <label>TIPO DE REGISTRO</label>
+      <div class="tipo-grid">
+        <button class="tipo-btn" id="btn-nc"   onclick="selTipo('NC')">
+          <span class="tipo-icon">⛔</span>No Conformidad
+        </button>
+        <button class="tipo-btn" id="btn-hall" onclick="selTipo('HALL')">
+          <span class="tipo-icon">🔍</span>Hallazgo
+        </button>
+        <button class="tipo-btn" id="btn-om"   onclick="selTipo('OM')">
+          <span class="tipo-icon">🌱</span>Oportunidad de Mejora
+        </button>
+      </div>
+    </div>
+ 
+    <div class="field">
+      <label for="obra-sel">OBRA</label>
+      <select id="obra-sel">
+        <option value="">— Seleccione obra —</option>
+        <option>Obra Quebrada Blanca</option>
+        <option>Otra Obra</option>
+      </select>
+    </div>
+ 
+    <div class="field">
+      <label for="obra-custom">NOMBRE / CÓDIGO DE OBRA (si aplica)</label>
+      <input type="text" id="obra-custom" placeholder="Ej: OBR-2025-045" />
+    </div>
+ 
+    <div class="row2">
+      <div class="field">
+        <label for="fecha">FECHA</label>
+        <input type="date" id="fecha" />
+      </div>
+      <div class="field">
+        <label for="hora">HORA</label>
+        <input type="time" id="hora" />
+      </div>
+    </div>
+ 
+    <div class="field">
+      <label for="identificador">IDENTIFICADO POR</label>
+      <input type="text" id="identificador" placeholder="Nombre completo del responsable" />
+    </div>
+ 
+    <div class="field">
+      <label for="cargo">CARGO / ROL</label>
+      <input type="text" id="cargo" placeholder="Ej: Supervisor de Terreno" />
+    </div>
+ 
+    <div class="nav-btns">
+      <button class="btn-next" onclick="irPaso(1)">Siguiente →</button>
+    </div>
+  </div>
+ 
+  <!-- PASO 1: Descripción -->
+  <div class="card" id="step1">
+    <div class="card-title">Paso 2 — Descripción del Hallazgo</div>
+ 
+    <div class="field">
+      <label for="ubicacion">UBICACIÓN ESPECÍFICA</label>
+      <input type="text" id="ubicacion" placeholder="Ej: Tablero TG-2, Nivel P3, Edificio B" />
+    </div>
+ 
+    <div class="field">
+      <label for="descripcion">DESCRIPCIÓN DETALLADA</label>
+      <textarea id="descripcion" rows="5" placeholder="Describa con detalle la no conformidad o hallazgo observado. Incluya condiciones detectadas, riesgo asociado, elementos afectados, etc."></textarea>
+    </div>
+ 
+    <div class="field">
+      <label for="norma">NORMA / ESPECIFICACIÓN INCUMPLIDA (opcional)</label>
+      <input type="text" id="norma" placeholder="Ej: Sec. Eléc. Art. 55, NCh2123, Especificación Técnica ET-05" />
+    </div>
+ 
+    <div class="field">
+      <label for="gravedad">NIVEL DE GRAVEDAD</label>
+      <select id="gravedad">
+        <option value="">— Seleccione —</option>
+        <option value="Crítico">🔴 Crítico – Riesgo inmediato / Detener trabajos</option>
+        <option value="Mayor">🟠 Mayor – Requiere acción correctiva urgente</option>
+        <option value="Menor">🟡 Menor – Requiere corrección en plazo breve</option>
+        <option value="Observación">🔵 Observación – Sin riesgo inmediato</option>
+      </select>
+    </div>
+ 
+    <div class="nav-btns">
+      <button class="btn-back" onclick="irPaso(0)">← Volver</button>
+      <button class="btn-next" onclick="irPaso(2)">Siguiente →</button>
+    </div>
+  </div>
+ 
+  <!-- PASO 2: Fotos -->
+  <div class="card" id="step2">
+    <div class="card-title">Paso 3 — Evidencia Fotográfica</div>
+ 
+    <div class="foto-grid" id="foto-grid">
+      <!-- slots generados por JS -->
+    </div>
+    <p class="foto-hint">Mínimo 1 foto · Máximo 5 fotos · Toca un slot para agregar</p>
+    <input type="file" id="file-input" accept="image/*" capture="environment" />
+ 
+    <div style="margin-top:20px;" class="field">
+      <label for="propuesta">PROPUESTA DE SOLUCIÓN</label>
+      <textarea id="propuesta" rows="5" placeholder="Describa la acción correctiva propuesta, responsable sugerido, plazo estimado de corrección, recursos necesarios, etc."></textarea>
+    </div>
+ 
+    <div class="nav-btns">
+      <button class="btn-back" onclick="irPaso(1)">← Volver</button>
+      <button class="btn-next" onclick="irPaso(3)">Siguiente →</button>
+    </div>
+  </div>
+ 
+  <!-- PASO 3: Firma y Guardar -->
+  <div class="card" id="step3">
+    <div class="card-title">Paso 4 — Firma y Guardar</div>
+ 
+    <p style="font-size:13px; color:var(--muted); margin-bottom:12px; line-height:1.5;">
+      Firme en el área indicada. Al guardar se generará el PDF y se almacenará en Drive.
+    </p>
+ 
+    <label>FIRMA DEL RESPONSABLE</label>
+    <div class="canvas-wrap">
+      <canvas id="firma-canvas" width="600" height="200"></canvas>
+    </div>
+    <div class="canvas-actions" style="margin-bottom:16px;">
+      <button class="btn-outline" onclick="limpiarFirma()">🗑 Limpiar firma</button>
+    </div>
+ 
+    <div class="field">
+      <label for="obs-cierre">OBSERVACIONES DE CIERRE (opcional)</label>
+      <textarea id="obs-cierre" rows="3" placeholder="Comentarios adicionales al momento de registrar…"></textarea>
+    </div>
+ 
+    <div class="nav-btns">
+      <button class="btn-back" onclick="irPaso(2)">← Volver</button>
+      <button class="btn-save" id="btn-guardar" onclick="guardarRegistro()">💾 Guardar en Drive</button>
+    </div>
+  </div>
+ 
+</main>
+ 
+<!-- TOAST -->
+<div id="toast"></div>
+ 
+<!-- GOOGLE IDENTITY SERVICES -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+ 
+<script>
+/* ═══════════════════════════════════════════════════
+   CONFIGURACIÓN
+═══════════════════════════════════════════════════ */
+const CLIENT_ID   = 'TU_GOOGLE_CLIENT_ID_AQUI';
+const FOLDER_ID   = '1GsYgIdVYF2wIrxu0Kh64KzP0YCrY0858';   // Carpeta Drive No Conformidades & Hallazgos
+const SCOPES      = 'https://www.googleapis.com/auth/drive.file';
+ 
+let accessToken   = null;
+let tokenClient   = null;
+let firmaHecha    = false;
+let pasoActual    = 0;
+const MAX_FOTOS   = 5;
+let fotosData     = [];  // array de { dataUrl, name }
+let slotActivo    = -1;
+let tipoRegistro  = '';
+ 
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+function toast(msg, tipo = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (tipo ? ' ' + tipo : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 3200);
+}
+ 
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  setFechaHora();
+  initFotoGrid();
+  initCanvas();
+  if (CLIENT_ID === 'TU_GOOGLE_CLIENT_ID_AQUI') return;
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    prompt: 'consent',
+    callback: (resp) => {
+      if (resp.error) { toast('Error de autenticación: ' + resp.error, 'err'); return; }
+      accessToken = resp.access_token;
+      actualizarAuthBar(true);
+      toast('Sesión iniciada ✓', 'ok');
+    }
+  });
+});
+ 
+function setFechaHora() {
+  const now = new Date();
+  document.getElementById('fecha').value = now.toISOString().slice(0,10);
+  document.getElementById('hora').value  =
+    String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+}
+ 
+/* ═══════════════════════════════════════════════════
+   AUTENTICACIÓN
+═══════════════════════════════════════════════════ */
+function iniciarSesion() {
+  if (CLIENT_ID === 'TU_GOOGLE_CLIENT_ID_AQUI') {
+    toast('Configura CLIENT_ID antes de usar', 'err'); return;
+  }
+  tokenClient.requestAccessToken();
+}
+function actualizarAuthBar(ok) {
+  document.getElementById('auth-status').textContent = ok
+    ? '✓ Conectado – listo para guardar en Drive'
+    : 'No autenticado – los registros no se guardarán en Drive';
+  document.getElementById('auth-btn').textContent = ok ? 'Reconectar' : 'Conectar con Google';
+}
+ 
+/* ═══════════════════════════════════════════════════
+   TIPO DE REGISTRO
+═══════════════════════════════════════════════════ */
+function selTipo(t) {
+  tipoRegistro = t;
+  document.getElementById('btn-nc').className   = 'tipo-btn' + (t === 'NC'   ? ' selected-nc'   : '');
+  document.getElementById('btn-hall').className = 'tipo-btn' + (t === 'HALL' ? ' selected-hall' : '');
+  document.getElementById('btn-om').className   = 'tipo-btn' + (t === 'OM'   ? ' selected-om'   : '');
+}
+ 
+/* ═══════════════════════════════════════════════════
+   STEPPER / NAVEGACIÓN
+═══════════════════════════════════════════════════ */
+function irPaso(n) {
+  if (n > pasoActual && !validarPaso(pasoActual)) return;
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('step'+i).classList.toggle('visible', i === n);
+    const dot = document.getElementById('dot'+i);
+    dot.className = 'step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+  pasoActual = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+ 
+function validarPaso(p) {
+  if (p === 0) {
+    if (!tipoRegistro)                             { toast('Selecciona Tipo de Registro', 'err'); return false; }
+    if (!document.getElementById('obra-sel').value){ toast('Selecciona la Obra', 'err'); return false; }
+    if (!document.getElementById('identificador').value.trim()) { toast('Ingresa el nombre del identificador', 'err'); return false; }
+  }
+  if (p === 1) {
+    if (!document.getElementById('descripcion').value.trim()) { toast('Escribe la descripción del hallazgo', 'err'); return false; }
+    if (!document.getElementById('gravedad').value)           { toast('Selecciona el nivel de gravedad', 'err'); return false; }
+  }
+  if (p === 2) {
+    if (fotosData.length < 1) { toast('Agrega al menos 1 foto como evidencia', 'err'); return false; }
+    if (!document.getElementById('propuesta').value.trim())   { toast('Escribe la propuesta de solución', 'err'); return false; }
+  }
+  return true;
+}
+ 
+/* ═══════════════════════════════════════════════════
+   FOTO GRID
+═══════════════════════════════════════════════════ */
+function initFotoGrid() {
+  const grid = document.getElementById('foto-grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < MAX_FOTOS; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'foto-slot';
+    slot.id = 'slot'+i;
+    slot.innerHTML = `<span class="add-icon">📷</span>
+      <button class="del-btn" onclick="eliminarFoto(event,${i})">✕</button>`;
+    slot.onclick = (e) => { if (!e.target.classList.contains('del-btn')) abrirFoto(i); };
+    grid.appendChild(slot);
+  }
+  renderFotos();
+}
+ 
+function abrirFoto(i) {
+  slotActivo = i;
+  const fi = document.getElementById('file-input');
+  fi.value = '';
+  fi.onchange = null;
+  fi.onchange = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      fotosData[slotActivo] = { dataUrl: ev.target.result, name: f.name };
+      renderFotos();
+    };
+    reader.readAsDataURL(f);
+  };
+  fi.click();
+}
+ 
+function eliminarFoto(ev, i) {
+  ev.stopPropagation();
+  fotosData.splice(i, 1);
+  renderFotos();
+}
+ 
+function renderFotos() {
+  for (let i = 0; i < MAX_FOTOS; i++) {
+    const slot = document.getElementById('slot'+i);
+    const d = fotosData[i];
+    if (d) {
+      slot.innerHTML = `<img src="${d.dataUrl}" alt="foto ${i+1}"/>
+        <button class="del-btn" onclick="eliminarFoto(event,${i})">✕</button>`;
+      slot.querySelector('.del-btn').addEventListener('click', (e) => eliminarFoto(e, i));
+    } else {
+      slot.innerHTML = `<span class="add-icon">📷</span>
+        <button class="del-btn" onclick="eliminarFoto(event,${i})">✕</button>`;
+    }
+    slot.onclick = (e) => { if (!e.target.classList.contains('del-btn')) abrirFoto(i); };
+  }
+}
+ 
+/* ═══════════════════════════════════════════════════
+   CANVAS FIRMA
+═══════════════════════════════════════════════════ */
+function initCanvas() {
+  const canvas = document.getElementById('firma-canvas');
+  const ctx    = canvas.getContext('2d');
+  let drawing  = false;
+  let lastX = 0, lastY = 0;
+ 
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / r.width;
+    const scaleY = canvas.height / r.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * scaleX, y: (src.clientY - r.top) * scaleY };
+  }
+  function start(e) { e.preventDefault(); drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; }
+  function move(e)  {
+    e.preventDefault();
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.strokeStyle = '#003B49';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    lastX = p.x; lastY = p.y;
+    firmaHecha = true;
+  }
+  function end(e) { e.preventDefault(); drawing = false; }
+ 
+  canvas.addEventListener('mousedown',  start);
+  canvas.addEventListener('mousemove',  move);
+  canvas.addEventListener('mouseup',    end);
+  canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove',  move,  { passive: false });
+  canvas.addEventListener('touchend',   end,   { passive: false });
+}
+ 
+function limpiarFirma() {
+  const c = document.getElementById('firma-canvas');
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  firmaHecha = false;
+}
+ 
+function obtenerFirmaPNG() {
+  const src = document.getElementById('firma-canvas');
+  const tmp = document.createElement('canvas');
+  tmp.width = src.width; tmp.height = src.height;
+  const ctx = tmp.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, tmp.width, tmp.height);
+  ctx.drawImage(src, 0, 0);
+  return tmp.toDataURL('image/png');
+}
+ 
+/* ═══════════════════════════════════════════════════
+   GENERAR PDF
+═══════════════════════════════════════════════════ */
+async function generarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  const PW = 210, PH = 297;
+  const ML = 15, MR = 15, MT = 15;
+  let y = MT;
+ 
+  // ── Helpers ──────────────────────────────────────
+  function checkPage(need = 10) {
+    if (y + need > PH - 15) { doc.addPage(); y = MT; }
+  }
+ 
+  function rect(x, w, h, fill, stroke) {
+    if (fill)   { doc.setFillColor(...fill);   doc.rect(x, y, w, h, 'F'); }
+    if (stroke) { doc.setDrawColor(...stroke); doc.rect(x, y, w, h, 'S'); }
+  }
+ 
+  // ── Encabezado ──────────────────────────────────
+  doc.setFillColor(0, 59, 73);
+  doc.rect(0, 0, PW, 28, 'F');
+  doc.setFillColor(207, 69, 32);
+  doc.rect(0, 28, PW, 2, 'F');
+ 
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text('SENERCOM – REGISTRO DE NO CONFORMIDADES Y HALLAZGOS', ML, 11);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Constructora e Ingeniería Senercom Limitada', ML, 18);
+  doc.text('Sistema de Gestión de Calidad | Documento de Terreno', ML, 23);
+  y = 36;
+ 
+  // ── Número de registro ──────────────────────────
+  const now    = new Date();
+  const folio  = 'NCH-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+  const tipo   = tipoRegistro === 'NC' ? 'NO CONFORMIDAD' : tipoRegistro === 'HALL' ? 'HALLAZGO' : 'OPORTUNIDAD DE MEJORA';
+  const grColor = { Crítico:[207,69,32], Mayor:[220,130,0], Menor:[200,160,0], Observación:[0,100,130] };
+  const tipoColor = tipoRegistro === 'NC' ? [207,69,32] : tipoRegistro === 'HALL' ? [184,112,16] : [26,138,80];
+  const grav   = document.getElementById('gravedad').value || '—';
+  const gc     = grColor[grav] || [100,100,100];
+ 
+  doc.setFillColor(...tipoColor);
+  doc.roundedRect(PW - MR - 54, y - 4, 54, 14, 2, 2, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.text(tipo, PW - MR - 27, y + 3, { align: 'center' });
+  doc.setFillColor(...gc);
+  doc.roundedRect(PW - MR - 54, y + 11, 54, 8, 2, 2, 'F');
+  doc.setFontSize(7);
+  doc.text(grav.toUpperCase(), PW - MR - 27, y + 16.5, { align: 'center' });
+ 
+  doc.setTextColor(0,59,73);
+  doc.setFontSize(8);
+  doc.text('Folio: ' + folio, ML, y + 3);
+  doc.text('Emisión: ' + document.getElementById('fecha').value + '  ' + document.getElementById('hora').value, ML, y + 8);
+  y += 24;
+ 
+  // ── Introducción ────────────────────────────────
+  doc.setFillColor(232, 244, 247);
+  doc.setDrawColor(168, 206, 218);
+  const introText = 'El presente documento está destinado a realizar mejoras en las cosas que hacemos, poniendo énfasis en la seguridad. No existen comentarios errados, todo ayuda a que tengamos un proceso de mejora continua y será evaluado en la reunión respectiva, en base al área que corresponda.';
+  const introLines = doc.splitTextToSize(introText, PW - ML - MR - 10);
+  const introH = introLines.length * 5 + 10;
+  doc.roundedRect(ML, y, PW - ML - MR, introH, 2, 2, 'FD');
+  doc.setFillColor(26, 138, 80);
+  doc.rect(ML, y, 3, introH, 'F');
+  doc.setFont('helvetica','italic');
+  doc.setFontSize(8.5);
+  doc.setTextColor(30, 74, 85);
+  introLines.forEach((line, i) => { doc.text(line, ML + 7, y + 7 + i * 5); });
+  y += introH + 6;
+ 
+  // ── Sección: Identificación ──────────────────────
+  function sectionTitle(title) {
+    checkPage(12);
+    doc.setFillColor(0, 59, 73);
+    doc.rect(ML, y, PW - ML - MR, 7, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    doc.text(title.toUpperCase(), ML + 3, y + 5);
+    y += 10;
+  }
+ 
+  function dataRow(label, value, x2col = false) {
+    checkPage(8);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100,130,140);
+    doc.text(label, ML, y);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(20,40,45);
+    doc.setFontSize(9);
+    doc.text(String(value || '—'), ML, y + 5);
+    y += 10;
+  }
+ 
+  sectionTitle('1. Identificación');
+  const obra = document.getElementById('obra-sel').value;
+  const obraCustom = document.getElementById('obra-custom').value.trim();
+  dataRow('OBRA', obraCustom ? obra + ' / ' + obraCustom : obra);
+  dataRow('IDENTIFICADO POR', document.getElementById('identificador').value);
+  dataRow('CARGO / ROL', document.getElementById('cargo').value);
+  dataRow('FECHA', document.getElementById('fecha').value);
+  dataRow('HORA', document.getElementById('hora').value);
+ 
+  // ── Sección: Descripción ─────────────────────────
+  sectionTitle('2. Descripción del Hallazgo');
+  dataRow('UBICACIÓN ESPECÍFICA', document.getElementById('ubicacion').value);
+ 
+  // Descripción larga
+  checkPage(20);
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(100,130,140);
+  doc.text('DESCRIPCIÓN DETALLADA', ML, y);
+  y += 5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(20,40,45);
+  const descLines = doc.splitTextToSize(document.getElementById('descripcion').value || '—', PW - ML - MR);
+  descLines.forEach(line => { checkPage(6); doc.text(line, ML, y); y += 5.5; });
+  y += 4;
+ 
+  dataRow('NORMA / ESPECIFICACIÓN', document.getElementById('norma').value);
+  dataRow('NIVEL DE GRAVEDAD', grav);
+ 
+  // ── Sección: Propuesta ──────────────────────────
+  sectionTitle('3. Propuesta de Solución');
+  checkPage(20);
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(100,130,140);
+  doc.text('PROPUESTA DE SOLUCIÓN', ML, y);
+  y += 5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(20,40,45);
+  const propLines = doc.splitTextToSize(document.getElementById('propuesta').value || '—', PW - ML - MR);
+  propLines.forEach(line => { checkPage(6); doc.text(line, ML, y); y += 5.5; });
+  y += 4;
+ 
+  const obsCierre = document.getElementById('obs-cierre').value.trim();
+  if (obsCierre) {
+    dataRow('OBSERVACIONES DE CIERRE', '');
+    const obsLines = doc.splitTextToSize(obsCierre, PW - ML - MR);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(20,40,45);
+    obsLines.forEach(line => { checkPage(6); doc.text(line, ML, y); y += 5.5; });
+    y += 4;
+  }
+ 
+  // ── Sección: Fotos ──────────────────────────────
+  if (fotosData.length > 0) {
+    sectionTitle('4. Evidencia Fotográfica');
+    const IW = (PW - ML - MR - 8) / 2;
+    const IH = IW * 0.70;
+    let col = 0;
+    const startX = [ML, ML + IW + 8];
+ 
+    for (const f of fotosData) {
+      if (col === 0) checkPage(IH + 10);
+      const x = startX[col];
+      try {
+        doc.addImage(f.dataUrl, 'JPEG', x, y, IW, IH, undefined, 'MEDIUM');
+      } catch(e) {
+        try { doc.addImage(f.dataUrl, 'PNG', x, y, IW, IH); } catch {}
+      }
+      doc.setDrawColor(180,200,210);
+      doc.rect(x, y, IW, IH, 'S');
+      col++;
+      if (col >= 2) { col = 0; y += IH + 6; }
+    }
+    if (col === 1) y += IH + 6;
+    y += 4;
+  }
+ 
+  // ── Firma ───────────────────────────────────────
+  checkPage(38);
+  sectionTitle('5. Firma del Responsable');
+  if (firmaHecha) {
+    const firmaImg = obtenerFirmaPNG();
+    doc.addImage(firmaImg, 'PNG', ML, y, 80, 25);
+  }
+  doc.setDrawColor(180,200,210);
+  doc.line(ML, y + 28, ML + 80, y + 28);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(80,110,120);
+  doc.text(document.getElementById('identificador').value, ML, y + 34);
+  doc.text(document.getElementById('cargo').value || 'Terreno', ML, y + 39);
+  y += 42;
+ 
+  // ── Pie de página ────────────────────────────────
+  const totalPages = doc.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setFillColor(0, 59, 73);
+    doc.rect(0, PH - 10, PW, 10, 'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(255,255,255);
+    doc.text('SENERCOM – Registro de No Conformidades y Hallazgos', ML, PH - 4);
+    doc.text('Folio: ' + folio + '  |  Pág. ' + p + ' / ' + totalPages, PW - MR, PH - 4, { align: 'right' });
+  }
+ 
+  return { blob: doc.output('blob'), folio };
+}
+ 
+/* ═══════════════════════════════════════════════════
+   GUARDAR EN DRIVE
+═══════════════════════════════════════════════════ */
+async function guardarRegistro() {
+  if (!validarPaso(2)) return;
+  if (!firmaHecha) { toast('Agrega la firma antes de guardar', 'err'); return; }
+ 
+  showSpinner('Generando PDF…');
+ 
+  let blob, folio;
+  try {
+    const res = await generarPDF();
+    blob  = res.blob;
+    folio = res.folio;
+  } catch (e) {
+    hideSpinner();
+    toast('Error al generar PDF: ' + e.message, 'err');
+    return;
+  }
+ 
+  if (!accessToken || FOLDER_ID === 'TU_FOLDER_ID_AQUI') {
+    hideSpinner();
+    const url = URL.createObjectURL(blob);
+    const a   = document.createElement('a');
+    a.href = url; a.download = folio + '.pdf'; a.click();
+    toast('PDF descargado localmente (sin Drive)', 'ok');
+    mostrarExito('PDF descargado localmente.<br/>Configura Drive para almacenamiento automático.');
+    return;
+  }
+ 
+  showSpinner('Subiendo a Drive…');
+  try {
+    const obra = document.getElementById('obra-sel').value || 'Obra';
+    const nombre = folio + '_' + obra.replace(/\s+/g,'_') + '.pdf';
+    const meta = JSON.stringify({ name: nombre, parents: [FOLDER_ID] });
+    const form = new FormData();
+    form.append('metadata', new Blob([meta], { type:'application/json' }));
+    form.append('file', blob, nombre);
+ 
+    const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + accessToken },
+      body: form
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    hideSpinner();
+    mostrarExito(`PDF guardado como:<br/><strong>${nombre}</strong><br/>en la carpeta de Drive asignada.`);
+  } catch (e) {
+    hideSpinner();
+    toast('Error al subir a Drive: ' + e.message, 'err');
+  }
+}
+ 
+function mostrarExito(msg) {
+  document.getElementById('success-msg').innerHTML = msg;
+  for (let i = 0; i < 4; i++) document.getElementById('step'+i).classList.remove('visible');
+  document.getElementById('success-screen').classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+ 
+function nuevoRegistro() {
+  document.getElementById('success-screen').classList.remove('visible');
+  // reset
+  tipoRegistro = '';
+  fotosData    = [];
+  firmaHecha   = false;
+  document.getElementById('btn-nc').className   = 'tipo-btn';
+  document.getElementById('btn-hall').className = 'tipo-btn';
+  document.getElementById('btn-om').className   = 'tipo-btn';
+  ['obra-sel','obra-custom','identificador','cargo','ubicacion','descripcion','norma','gravedad','propuesta','obs-cierre']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  limpiarFirma();
+  initFotoGrid();
+  setFechaHora();
+  irPaso(0);
+}
+ 
+/* ═══════════════════════════════════════════════════
+   SPINNER
+═══════════════════════════════════════════════════ */
+function showSpinner(msg='Procesando…') {
+  document.getElementById('spinner-label').textContent = msg;
+  document.getElementById('spinner').classList.add('show');
+}
+function hideSpinner() {
+  document.getElementById('spinner').classList.remove('show');
+}
+ 
+/* ═══════════════════════════════════════════════════
+   SERVICE WORKER (network-first)
+═══════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  const SW_CODE = `
+const CACHE = 'nch-v1';
+self.addEventListener('install',  e => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks =>
+  Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+).then(()=>self.clients.claim())));
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request).then(r => {
+      const c = r.clone();
+      caches.open(CACHE).then(cache => cache.put(e.request, c));
+      return r;
+    }).catch(() => caches.match(e.request))
+  );
+});`;
+  const blob = new Blob([SW_CODE], { type: 'application/javascript' });
+  navigator.serviceWorker.register(URL.createObjectURL(blob));
+}
+</script>
+</body>
+</html>
